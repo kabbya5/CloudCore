@@ -5,5 +5,6 @@
 
     <main class="bg-white p-2">
         <slot />
+        <Notifications />
     </main>
 </template>
