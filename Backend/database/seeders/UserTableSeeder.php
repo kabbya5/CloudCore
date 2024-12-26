@@ -16,7 +16,7 @@ class UserTableSeeder extends Seeder
     {
         User::factory()
             ->count(10)
-            ->hasTasks(rand(0, 100))
+            ->hasTasks(rand(0, 500))
             ->create();
     }
 

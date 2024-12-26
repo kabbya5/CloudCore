@@ -12,28 +12,42 @@
                 <div class="mb-4">
                     <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
                     <input 
-                        v-model="task.title"
+                        v-model="localTask.title"
                         type="text" 
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                         placeholder="Enter title"
                     />
                 </div>
+
+                <div class="mb-4">
+                    <label for="priority" class="block text-sm font-medium text-gray-700"> Assign To </label>
+                    <select
+                        required
+                        v-model="localTask.assigned_to"
+                        type="text" 
+                        class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"           
+                    >
+                      <option value="" selected disabled>  Select </option>
+                      <option v-for="user in users" value="user.id"> {{ user.name }} </option>
+                    </select>
+                </div>
+
                 <div class="mb-4">
                     <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
                     <select
-                        v-model="task.status"
+                        v-model="localTask.status"
                         type="text" 
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
                       <option value="pending"> Pending </option>
-                      <option value="procesing"> Procesing </option>
+                      <option value="progress"> Progress </option>
                     </select>
                 </div>
 
                 <div class="mb-4">
                     <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
                     <select
-                        v-model="task.priority"
+                        v-model="localTask.priority"
                         type="text" 
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"           
                     >
@@ -46,16 +60,16 @@
                 <div class="mb-4">
                     <label  class="block text-sm font-medium text-gray-700">Due Date</label>
                     <input 
-                        v-model="task.due_date"
+                        v-model="localTask.due_date"
                         type="date" 
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     />
                 </div>
 
                 <div class="mb-4">
-                    <label  class="block text-sm font-medium text-gray-700"> Details </label>
+                    <label  class="block text-sm font-medium text-gray-700"> Description </label>
                     <textarea
-                        v-model="task.description"
+                        v-model="localTask.description"
                         
                         class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
                     >
@@ -73,13 +87,17 @@
 </template>
   
 <script setup lang="ts">
-
+import { useNotificationsStore } from '~/stores/notifications';
+const notification = useNotificationsStore();
+const router = useRouter();
 const props = defineProps({
     isVisible:Boolean,
     isEditMode:Boolean,
     task:Object,
 })
- 
+
+const users = ref<any|null>();
+
 const localTask = ref({ ...props.task });
 const emit = defineEmits(['update:isVisible', 'submitTask']);
 
@@ -87,6 +105,20 @@ const handleSubmit = () => {
   emit('submitTask', localTask.value);   
 };
 
+onMounted(async () => {
+  try{
+    const data = await useCustomFetch('/users');
+    if(data.value){
+      users.value = data.value.users;
+    }else{
+      console.log(data.value);
+      throw new Error(`Fetch error: unable to fetch users`);
+    }
+  }catch(error){
+    notification.addNotification('Users fetch problem. Store some fack users', 'warning');
+    router.push('/');
+  }
+});
 
 const closeModal = () => {
   emit('update:isVisible', false);

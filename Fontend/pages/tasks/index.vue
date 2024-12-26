@@ -33,7 +33,6 @@
                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                 </div>
-    
             <div>
                 <select 
                 v-model="searchInput.status"
@@ -41,9 +40,9 @@
                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                 <option value="">All Status</option>
-                <option value="open">Open</option>
-                <option value="in_progress">In Progress</option>
-                <option value="closed">Closed</option>
+                <option value="pending">Pending</option>
+                <option value="progress">progress</option>
+                <option value="completed">Completed</option>
                 </select>
             </div>
     
@@ -66,10 +65,14 @@
                 @change="filterTasks"
                 class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                <option value="">All Status</option>
-                <option value="open">Open</option>
-                <option value="in_progress">In Progress</option>
-                <option value="closed">Closed</option>
+                    <option value=""> Default </option>
+                    <option value="due_date-DESC"> Due Date (DESC) </option>
+                    <option value="status-ASC"> Status (ASC) </option>
+                    <option value="status-DESC"> Status (DESC) </option>
+                    <option value="priority-DESC"> Prority (DESC)  </option>
+                    <option value="priority-DSC"> Priority (ASC) </option>
+                    
+                
                 </select>
             </div>
     
@@ -84,21 +87,23 @@
             </div>
 
         </div>
+        <div>
+            <Tasks />
+        </div>
+        
     </div>
-
   </template>
 
   <script setup lang="ts"> 
     import { useTasksStore } from '~/stores/task';
     const tasksStore = useTasksStore();
     interface SearchForm {
-        search_query:string|null,
-        status:string|null,
-        periority:string|null,
-        order_by:string|null,
-        due_date:string|null,
+        search_query:string,
+        status:string,
+        periority:string,
+        order_by:string,
+        due_date:string,
     }
-
 
     const searchInput = ref<SearchForm>({
         search_query:'',
@@ -110,13 +115,14 @@
 
     const isVisible = ref(false); 
     const isEditMode = ref(false);
-
+   
     const task = ref({
         title: '',
         status:'pending',
         priority:'high',
         description: '',
         due_date: '',
+        assigned_to:null,
     });
 
     const addTask = () =>{
@@ -128,6 +134,45 @@
         if(response == 'success'){
             isVisible.value = false;  
         } 
+    };
+
+    const handleScroll = () => {
+        if (window.innerHeight + window.scrollY >= document.body.scrollHeight) {
+            if (!tasksStore.loading && tasksStore.hasMore) {
+                tasksStore.fetchTasks(
+                    searchInput.value.status,
+                    searchInput.value.periority,
+                    searchInput.value.search_query,
+                    searchInput.value.due_date,
+                    searchInput.value.order_by,
+                );
+            }
+        }
+    };
+
+    onMounted(async () => {
+        tasksStore.fetchTasks(
+            searchInput.value.status,
+            searchInput.value.periority,
+            searchInput.value.search_query,
+            searchInput.value.due_date,
+            searchInput.value.order_by,
+        );
+        window.addEventListener('scroll', handleScroll); 
+    });
+
+    onBeforeUnmount(() => {
+        window.removeEventListener('scroll', handleScroll); 
+    });
+
+    const filterTasks = async () => {
+        tasksStore.fetchTasks(
+            searchInput.value.status,
+            searchInput.value.periority,
+            searchInput.value.search_query,
+            searchInput.value.due_date,
+            searchInput.value.order_by,
+        );
     };
   </script>
   

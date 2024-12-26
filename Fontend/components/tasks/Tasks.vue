@@ -1,4 +1,14 @@
 <template>
+     <TasksCreate 
+        :isVisible="isVisible"
+        @update:isVisible="isVisible = $event"
+        :isEditMode="isEditMode"
+        :task="currentTask"
+        @submitTask="handleTaskSubmit"
+    />
+
+    <TasksView />
+
     <div class="relative flex flex-col w-full h-full overflow-auto text-gray-700 bg-white shadow-md rounded-lg bg-clip-border">
         <table class="w-full text-left table-auto min-w-max text-slate-800">
             <thead>
@@ -62,18 +72,28 @@
                         {{ task.status }}
                     </p>
                     </td>
-                    <td class="p-2">
-                        <button @click="viewTask(task)" class="text-blue-500 hover:underline">
-                            View
-                        </button>
-        
-                        <button @click="editTask(task)" class="text-green-500 hover:underline">
-                            Edit
-                        </button>
-        
-                        <button @click="deleteTask(task.id)" class="text-red-500 hover:underline">
-                            Delete
-                        </button>
+                    <td class="border px-4 py-2 relative">
+                        <div class="relative inline-block text-left">
+                            <button @click="toggleDropdown(task.id)" class="bg-blue-500 text-white px-4 py-1 rounded">
+                                Actions
+                            </button>
+                            <div
+                            v-if="dropdownOpen === task.id"
+                            class="absolute right-0 mt-2 w-40 bg-white rounded-md shadow-lg z-50"
+                            >
+                            <ul class="py-1">
+                                <li>
+                                <button @click="viewItem(task.slug)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left">View</button>
+                                </li>
+                                <li>
+                                <button @click="editTask(task)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left">Edit</button>
+                                </li>
+                                <li>
+                                <button @click="deleteItem(task.id)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left text-red-500">Delete</button>
+                                </li>
+                            </ul>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             </tbody>
@@ -84,6 +104,41 @@
 <script setup lang="ts">
 import { useTasksStore } from '~/stores/task';
 const taskStore = useTasksStore();
-console.log('tssk',taskStore.tasks);
+const dropdownOpen = ref<number | null>(null)
 
+const isVisible = ref(false); 
+const isEditMode = ref(false);
+   
+const currentTask = ref<any>({});
+
+const editTask = (task: any) => {
+  currentTask.value = task;
+
+  isEditMode.value = true;
+  isVisible.value = !isVisible.value;
+}
+
+const handleTaskSubmit = async (updatedTask :any) => {
+    const response = await tasksStore.store(updatedTask);
+    if(response == 'success'){
+        isVisible.value = false;  
+    } 
+};
+
+const toggleDropdown = (id: number) => {
+    dropdownOpen.value = dropdownOpen.value === id ? null : id
+}
+
+const viewItem = (slug:string) => {
+    const task = taskStore.viewTask(slug);
+    currentTask.value = task;
+}
+const editItem = (item: any) => {
+    alert(`Editing ${item.name}`)
+}
+const deleteItem = (item: any) => {
+    if (confirm(`Delete ${item.name}?`)) {
+        items.value = items.value.filter(i => i.id !== item.id)
+    }
+}
 </script>

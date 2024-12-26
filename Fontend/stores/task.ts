@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useNotificationsStore } from '../stores/notifications';
-
+import { useRouter } from 'nuxt/app';
 export const useTasksStore = defineStore('tasks', {
   state: () => ({
     tasks: [] as any[],
@@ -8,10 +8,13 @@ export const useTasksStore = defineStore('tasks', {
     page: 1,
     limit: 20,
     hasMore: true,
+    priority:'',
+    status:'',
+    order_by:'',
   }),
   
   actions: {
-    async fetchTasks(status = 'progress', priority = 'high',resetPagination = false) {
+    async fetchTasks(status = '', priority = '', search_query = '', due_date ='', order_by = '') {
         if(this.page === 1){
             this.tasks = [];
         }
@@ -19,10 +22,13 @@ export const useTasksStore = defineStore('tasks', {
         
         this.loading = true;
 
-        if (resetPagination) {
+        if (this.priority != priority || this.status != status || this.order_by != order_by ) {
             this.page = 1;
             this.tasks = [];  
             this.hasMore = true;
+            this.order_by = order_by;
+            this.priority = priority;
+            this.status = status;
         }
         try {
             const queryParams = new URLSearchParams({
@@ -30,6 +36,9 @@ export const useTasksStore = defineStore('tasks', {
                 limit: String(this.limit),
                 status,
                 priority,
+                search_query,
+                order_by,
+                due_date,
               });
 
             const response = await useCustomFetch(`/tasks?${queryParams.toString()}`);
@@ -43,23 +52,27 @@ export const useTasksStore = defineStore('tasks', {
                 this.tasks.push(...tasks);
                 this.page++;
                
-            } else {
-                console.error('Response data is missing:', response);
+            }else{
+              const router = useRouter()
+              router.push(`/tasks`) 
             }
         } catch (error) {
+            const router = useRouter()
+            router.push(`/tasks`) 
             console.error('Error fetching tasks:', error);
         } finally {
           this.loading = false;
         }
     },
 
-   async store(task){
+    async store(task){
       try{
-        const notificationsStore = useNotificationsStore(); 
-        const response = await useCustomFetch('/tasks',{
-          method: 'POST',
-          body: task as taskForm,
+          const notificationsStore = useNotificationsStore(); 
+          const response = await useCustomFetch('/tasks',{
+            method: 'POST',
+            body: task as taskForm,
         });
+        
         const rawValue = response._rawValue;
         if(rawValue){
           notificationsStore.addNotification("Then task hass been created successfully","success");
@@ -71,26 +84,21 @@ export const useTasksStore = defineStore('tasks', {
       }
     },
 
-    async liketask(taskId:number){
-      
-      const baseUrl = getBaseUrl();
-      const task = this.tasks.find(p => p.id === taskId);
-      if(task){
-        try{
-          await useCustomFetch(`${baseUrl}/tasks/${taskId}/like`,{method:'task'});
-          if(task.isLiked){
-            task.isLiked = false;
-            task.likes_count--
-          }else{
-            task.isLiked = true;
-            task.likes_count++;
-          }
-          
-        }catch(error){
-          notificationStore.addNotification('Failed to like/unlike the task','error');
-        }
-      }
-    }
-  },
+    async viewTask(slug:string){
+      try{
 
+        const response = await useCustomFetch(`/tasks/${slug}`,);
+        const task = response.value.task;
+        if(task){
+            return task; 
+        }else{
+          return null;
+        }
+      }catch(error){
+        console.log(error);
+        return false;
+      }
+    },
+
+  },
 });

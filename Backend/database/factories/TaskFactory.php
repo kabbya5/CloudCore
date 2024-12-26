@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
 
 
 /**
@@ -18,8 +19,10 @@ class TaskFactory extends Factory
      */
     public function definition(): array
     {
+        $title = $this->faker->sentence;
         return [
-            'title' => $this->faker->sentence,
+            'title' => $title,
+            'slug' => Str::slug($title),
             'description' => $this->faker->paragraph,
             'due_date' => $this->faker->dateTimeBetween('now', '+1 year'),
             'priority' => $this->faker->randomElement(['low', 'high', 'medium']),
