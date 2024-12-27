@@ -13,6 +13,22 @@ http://127.0.0.1:8000/api/signup
   "password": "Str0ng@Pass12",
   "password_confirmation": "Str0ng@Pass12"
 }
+```
+### Email verification for login and register 
+```text 
+http://127.0.0.1:800/api/verify-code/{user_id} 
+http://127.0.0.1:8000/api/verify-code/1
+```
+```json
+{
+    "code": 12345
+}
+```
+### Logout 
+```text
+http://127.0.0.1:8000/api/logout
+```
+
 ```text 
 Post Method
 Endpoint:/api/tasks/
