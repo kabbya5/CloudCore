@@ -38,22 +38,6 @@ http://127.0.0.1:8000/api/login
   "password": "Str0ng@Pass12"
 }
 ```
-```text 
-Post Method
-Endpoint:/api/tasks/
-```
-
-```json
-{
-    "title": "Task Title",
-    "description": "Et itaque voluptatem sunt quia ducimus. Asperiores alias labore inventore quibusdam tempora. Praesentium officiis maxime id accusantium cumque ut enim.",
-    "due_date": "2024-12-27",
-    "priority": "high",
-    "status": "pending",
-    "assigned_to":1,
-    "user_id": 1
-}
-```
 ### Filter tasks 
 ```text 
 http://127.0.0.1:8000/:/api/tasks?params
@@ -72,7 +56,9 @@ http://127.0.0.1:8000/:/api/tasks?params
 ```
 
 ### Show task 
-
+```text 
+http://127.0.0.1:8000/api/tasks
+``
 ### Create task 
 ```text 
 http://127.0.0.1:8000/api/tasks
