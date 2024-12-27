@@ -1,3 +1,7 @@
-#head{
-    background: #000;
-}
+@use 'abstracts/function';
+@use 'layouts/authenticationForm';
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
