@@ -1,18 +1,18 @@
 ## Frontend:
 
-Utilized Nuxt.js, TypeScript, Tailwind CSS, and Pinia.js
-Developed task, auth, and notification stores
-Created components and pages
-Managed CSRF and authentication tokens
-Created a custom customFetch composition to handle errors and manage headers
+* Utilized Nuxt.js, TypeScript, Tailwind CSS, and Pinia.js
+* Developed task, auth, and notification stores
+* Created components and pages
+* Managed CSRF and authentication tokens
+* Created a custom customFetch composition to handle errors and manage headers
 
 ## Backend:
 
-Implemented CRUD operations for tasks
-Developed a notification system
-Integrated Two-Factor Authentication
-Added task reminder and scheduler functionality
-Built a filter and search system for tasks
+* Implemented CRUD operations for tasks
+* Developed a notification system
+* Integrated Two-Factor Authentication
+* Added task reminder and scheduler functionality
+* Built a filter and search system for tasks
 
 ### Create user 
 ```text
