@@ -1,4 +1,4 @@
-##Frontend:
+## Frontend:
 
 Utilized Nuxt.js, TypeScript, Tailwind CSS, and Pinia.js
 Developed task, auth, and notification stores
