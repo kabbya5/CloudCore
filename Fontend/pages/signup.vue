@@ -145,6 +145,5 @@ const errors = ({});
 
 const submitForm = async () => {
     await authStore.singUp(form);
-    router.push('/');
 };
 </script>

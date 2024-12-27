@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useNotificationsStore } from '../stores/notifications';
-import { useRouter } from 'nuxt/app';
+
 export const useTasksStore = defineStore('tasks', {
   state: () => ({
     tasks: [] as any[],
@@ -53,24 +53,21 @@ export const useTasksStore = defineStore('tasks', {
                 this.page++;
                
             }else{
-              const router = useRouter()
-              router.push(`/tasks`) 
+              console.log(response);
             }
         } catch (error) {
-            const router = useRouter()
-            router.push(`/tasks`) 
             console.error('Error fetching tasks:', error);
         } finally {
           this.loading = false;
         }
     },
 
-    async store(task){
+    async store(task:any){
       try{
           const notificationsStore = useNotificationsStore(); 
           const response = await useCustomFetch('/tasks',{
             method: 'POST',
-            body: task as taskForm,
+            body: task,
         });
         
         const rawValue = response._rawValue;

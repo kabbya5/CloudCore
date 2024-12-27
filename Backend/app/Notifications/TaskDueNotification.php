@@ -38,7 +38,7 @@ class TaskDueNotification extends Notification implements ShouldQueue
         return (new MailMessage)
                     ->subject('Task Due Reminder')
                     ->line('Your task "' . $this->task->title . '" is due today.')
-                    ->action('View Task', url('http://localhost:3000/api/tasks/' . $this->task->slug));
+                    ->action('View Task', url('http://localhost:3000/tasks/' . $this->task->slug));
     }
 
     /**

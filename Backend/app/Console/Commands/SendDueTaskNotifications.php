@@ -29,7 +29,7 @@ class SendDueTaskNotifications extends Command
 
     public function handle()
     {
-        $tasks = Task::where('id', 1)->get();
+        $tasks = Task::whereDate('due_date', Carbon::today())->get();
 
         foreach ($tasks as $task) {
             $task->user->notify(new TaskDueNotification($task));

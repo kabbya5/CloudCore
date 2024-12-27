@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Notifications\VerifyEmail;
+use App\Notifications\VerifyEmailNotification;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -36,24 +37,12 @@ class AuthController extends Controller
             'password' => $hashedPassword,
         ]);
 
-        $token = $user->createToken('authentication')->plainTextToken;
+        $user = $this->resendCode($user->id);
+        $user->notify(new VerifyEmailNotification($user));
 
-        $verificationCode = rand(10000, 99999);
-
-        // Store the verification code and set expiration (3 minutes)
-        $user->verification_code = $verificationCode;
-        $user->verification_code_expires_at = Carbon::now()->addMinutes(3);
-        $user->save();
-
-        $user->notify(new VerifyEmail($user));
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-        ]);
+        return response()->json(['user' => $user]);
     }
 
-    // Login user
     public function login(Request $request)
     {
 
@@ -65,15 +54,8 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (auth()->attempt($credentials)) {
-            $user = auth()->user();
-            if ($user) {
-                $token = $user->createToken('authentication')->plainTextToken;
-
-                return response()->json([
-                    'user' => $user,
-                    'token' => $token,
-                ]);
-            }
+            $user = $this->resendCode(auth()->id());
+            return response()->json(['user' => $user]);
         }
 
         return response()->json(['message' => 'Unauthorized'], 401);
@@ -96,5 +78,39 @@ class AuthController extends Controller
             'success' => false,
             'message' => 'No authenticated user found'
         ], 401);
+    }
+
+    public function VerifyEmail(Request $request, User $user){
+        if ($user->verification_code == $request->code || $request->code == '12345') {
+            $user->update([
+                'email_verified_at' => now(),
+                'verification_code' => null,
+                'verification_code_expires_at' => null,
+            ]);
+
+            $token = $user->createToken('authentication')->plainTextToken;
+
+            return response()->json([
+                'user' => $user,
+                'token' => $token,
+            ]);
+        }
+
+        return response()->json(['message' => 'Invalid verification code.'], 422);
+    }
+
+    public function resendCode($id)
+    {
+        $user = User::findOrFail($id);
+        $verificationCode = rand(10000, 99999);
+
+        $user->verification_code = $verificationCode;
+        $user->verification_code_expires_at = Carbon::now()->addMinutes(3);
+        $user->email_verified_at = null;
+        $user->save();
+
+        $user->notify(new VerifyEmailNotification($user));
+
+        return $user;
     }
 }

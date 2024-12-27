@@ -68,7 +68,6 @@ const loginForm = ref<loginType>({
 
 const handleLogin = async() =>{
     authStore.login(loginForm);
-    router.push('/');
 }
 
 </script>

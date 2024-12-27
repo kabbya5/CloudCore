@@ -12,12 +12,15 @@ Route::get('/user', function (Request $request) {
 Route::controller(AuthController::class)->group(function () {
     Route::post('/signup', 'signup');
     Route::post('/login', 'login');
+    Route::post('/verify-code/{user}','verifyEmail');
+    Route::post('/resend-code/{id}', 'resendCode');
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('/logout', [AuthController::class,'logout']);
+
 
     Route::controller(TaskController::class)->group(function(){
         Route::get('tasks', 'index');

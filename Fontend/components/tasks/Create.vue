@@ -119,7 +119,6 @@ onMounted(async () => {
     }
   }catch(error){
     notification.addNotification('Users fetch problem. Store some fack users', 'warning');
-    router.push('/');
   }
 });
 

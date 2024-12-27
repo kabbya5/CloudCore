@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
 import { useAuthenticationStore } from './authentication';
 import type { AuthenticationForm } from '~/types/form';
-
+import { useRouter } from 'nuxt/app';
 export const useAuthStore = defineStore('user', {
     state:() =>({
         user:[] as any[],
@@ -17,23 +17,19 @@ export const useAuthStore = defineStore('user', {
                     method: 'POST',
                     body: form as AuthenticationForm,
                 });
-
-                const rawValue = response._rawValue;
-                const token = rawValue.token; 
-
-                const {setToken, setUser} = useAuthenticationStore();
-                if(token){
-                    setToken(token);
-                    setUser(rawValue.user);
+                const user = response.value.user;
+                if(user){
+                    const router = useRouter()
+                    router.push(`/verify-code/${user.id}`);
                 }
-                
+                        
             }catch (error: any) {
                 console.log('Error during sign-up:', error);
                 if (error.response) {
                     console.log('Response error:', error.response);  // Log any response-related error details
                 } else {
                     console.log('Unknown error:', error);  // Handle unknown errors
-                }  console.log('error'. error.response);
+                }  
             }finally{
                 this.loading = false;
             }
@@ -46,15 +42,13 @@ export const useAuthStore = defineStore('user', {
                     method: 'POST',
                     body: form as AuthenticationForm,
                 });
-      
-                const rawValue = response._rawValue;
-                const token = rawValue.token;
-        
-                const {setToken, setUser} = useAuthenticationStore();
-                if(token){
-                    setToken(token);
-                    setUser(rawValue.user);
+
+                const user = response.value.user;
+                if(user){
+                    const router = useRouter()
+                    router.push(`/verify-code/${user.id}`);
                 }
+      
             } catch (error: any) {
                 console.log('Login error:', error);
             } finally {

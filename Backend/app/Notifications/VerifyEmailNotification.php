@@ -9,21 +9,18 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Crypt;
 
-class VerifyEmail extends Notification implements ShouldQueue
+class VerifyEmailNotification extends Notification implements ShouldQueue
 {
     use Queueable;
     protected $user;
     protected $verificationCode;
-    protected $expiresAt;
-
     /**
      * Create a new notification instance.
      */
     public function __construct($user)
     {
         $this->user = $user;
-        $this->verificationCode = rand(100000, 999999);
-        $this->expiresAt = Carbon::now()->addMinutes(3);
+        $this->verificationCode =  $user->verification_code;
     }
 
     /**
@@ -39,11 +36,8 @@ class VerifyEmail extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      */
-    public function toMail($notifiable)
+    public function toMail(object $notifiable): MailMessage
     {
-
-        $encryptedCode = Crypt::encryptString($this->verificationCode);
-        $encryptedExpiresAt = Crypt::encryptString($this->expiresAt);
 
         return (new MailMessage)
             ->subject('Email Verification - YourApp')
@@ -51,7 +45,7 @@ class VerifyEmail extends Notification implements ShouldQueue
             ->line('Thank you for registering with YourApp! Use the code below to verify your email.')
             ->line('Verification Code: ' . $this->verificationCode)
             ->line('This code will expire in 3 minutes.')
-            ->action('Verify Email', url('/verify-code/' . $this->user->id . '/' . $encryptedCode . '/' . $encryptedExpiresAt))
+            ->action('Verify Email', url('http://localhost:3000/verify-code/' . $this->user->id))
             ->line('If you did not register, no further action is required.');
     }
 
