@@ -113,5 +113,3 @@ http://127.0.0.1:8000/api/tasks/task-title
 ```text 
 http://127.0.0.1:8000/api/tasks/task-title
 ```
-### Create Notification
-create a notification system for success or error messages when performing actions like record deletion, creation Etc and on delete the restore system.
