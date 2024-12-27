@@ -7,6 +7,7 @@ use App\Models\Task;
 use App\Models\User;
 use Illuminate\Http\Request;
 use DB;
+use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
@@ -79,7 +80,10 @@ class TaskController extends Controller
         return response()->json(['users' => $users], 200);
     }
 
-    public function store(StoreTaskRequest $request){
+    public function store(StoreTaskRequest $request)
+    {
+        Gate::authorize('create', Task::class);
+
         $user_id = auth()->id();
         $data = $request->only('title', 'status', 'priority', 'due_date', 'description');
         $data['user_id'] = $user_id;
@@ -93,9 +97,15 @@ class TaskController extends Controller
     }
 
     public function update(StoreTaskRequest $request,Task $task){
+        Gate::authorize('update', $task);
         $data = $request->only('title', 'status', 'priority', 'due_date', 'description');
         $task->update($data);
 
         return response()->json(['task' => $task],200);
+    }
+
+    Public function delete(Task $task){
+        Gate::authorize('delete', $task);
+        $task->delete();
     }
 }

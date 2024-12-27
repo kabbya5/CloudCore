@@ -21,12 +21,13 @@ class StoreTaskRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'title' => 'required|string|max:255',
-            'status' => 'required|in:pending,completed',
-            'priority' => 'required|in:high,medium,low',
-            'description' => 'nullable|string|max:1000',
-            'due_date' => 'required|date|after_or_equal:today',
-        ];
+        return [];
+        // return [
+        //     'title' => 'required|string|max:255',
+        //     'status' => 'required|in:pending,completed',
+        //     'priority' => 'required|in:high,medium,low',
+        //     'description' => 'nullable|string|max:1000',
+        //     'due_date' => 'required|date|after_or_equal:today',
+        // ];
     }
 }

@@ -1,13 +1,15 @@
 <template>
      <TasksCreate 
-        :isVisible="isVisible"
-        @update:isVisible="isVisible = $event"
+        :isVisible="isEditMode"
+        @update:isVisible="isEditMode = $event"
         :isEditMode="isEditMode"
         :task="currentTask"
         @submitTask="handleTaskSubmit"
     />
 
-    <TasksView />
+    <TasksShow v-if="isVisible && currentTask" 
+      :task="currentTask" 
+      @close="currentTask = null" />
 
     <div class="relative flex flex-col w-full h-full overflow-auto text-gray-700 bg-white shadow-md rounded-lg bg-clip-border">
         <table class="w-full text-left table-auto min-w-max text-slate-800">
@@ -83,13 +85,13 @@
                             >
                             <ul class="py-1">
                                 <li>
-                                <button @click="viewItem(task.slug)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left">View</button>
+                                <button @click="viewTask(task.slug)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left">View</button>
                                 </li>
                                 <li>
                                 <button @click="editTask(task)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left">Edit</button>
                                 </li>
                                 <li>
-                                <button @click="deleteItem(task.id)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left text-red-500">Delete</button>
+                                <button @click="deleteTask(task.slug)" class="block px-4 py-2 hover:bg-gray-100 w-full text-left text-red-500">Delete</button>
                                 </li>
                             </ul>
                             </div>
@@ -103,19 +105,19 @@
 
 <script setup lang="ts">
 import { useTasksStore } from '~/stores/task';
+import { useNotificationsStore } from '#build/imports';
+
 const taskStore = useTasksStore();
 const dropdownOpen = ref<number | null>(null)
 
-const isVisible = ref(false); 
 const isEditMode = ref(false);
-   
+const isVisible = ref(false);
 const currentTask = ref<any>({});
 
 const editTask = (task: any) => {
   currentTask.value = task;
-
   isEditMode.value = true;
-  isVisible.value = !isVisible.value;
+  console.log(currentTask.value);
 }
 
 const handleTaskSubmit = async (updatedTask :any) => {
@@ -129,16 +131,17 @@ const toggleDropdown = (id: number) => {
     dropdownOpen.value = dropdownOpen.value === id ? null : id
 }
 
-const viewItem = (slug:string) => {
-    const task = taskStore.viewTask(slug);
-    currentTask.value = task;
+const viewTask =  async (slug:string) => {
+    const task = await taskStore.viewTask(slug);
+    currentTask.value =  task;
+    isVisible.value = false;
 }
-const editItem = (item: any) => {
-    alert(`Editing ${item.name}`)
-}
-const deleteItem = (item: any) => {
-    if (confirm(`Delete ${item.name}?`)) {
-        items.value = items.value.filter(i => i.id !== item.id)
+
+const deleteTask = (slug: any) => {
+    if (confirm(`Delete ${slug}?`)) {
+        taskStore.tasks = taskStore.tasks.filter(t => t.slug !== slug);
+        const respone =  useCustomFetch(`/tasks/slug`, {method:'delte'});
+        useNotificationsStore().addNotification('The task has been deleted','success');
     }
 }
 </script>

@@ -93,8 +93,11 @@ const router = useRouter();
 const props = defineProps({
     isVisible:Boolean,
     isEditMode:Boolean,
-    task:Object,
-})
+    task: {
+        type: Object,
+        required: true
+    }
+});
 
 const users = ref<any|null>();
 

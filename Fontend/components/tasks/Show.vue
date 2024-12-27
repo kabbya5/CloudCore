@@ -1,86 +1,72 @@
 <template>
     <div 
-        v-if="isVisible" 
+        v-if="task && task.title" 
         class="modal-overlay"
         @click.self="closeModal"  
     >
       <div class="modal-content">
-            <h2 class="font-xl mb-3 text-xl"> Create Task </h2>
+            <button class="close-button" @click="closeModal">×</button>
+            <h2 class="font-xl mb-3 text-2xl">Task Details</h2>
+
             <div class="mb-4">
-                <label for="title" class="block text-sm font-medium text-gray-700">Title</label>
-                <p class="mt-1 block w-full px-3 py-2 shadow-sm"> {{ task.title }} </p>
+                <label class="block text-sm font-medium text-gray-700">Title</label>
+                <p class="mt-1 block w-full px-3 py-2 shadow-sm text-xl"> 
+                    {{ task.title }} 
+                </p>
             </div>
 
             <div class="mb-4">
-                <label for="priority" class="block text-sm font-medium text-gray-700"> Assign To </label>
-                <select
-                    required
-                    v-model="localTask.assigned_to"
-                    type="text" 
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"           
-                >
-                    <option value="" selected disabled>  Select </option>
-                    <option v-for="user in users" value="user.id"> {{ user.name }} </option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700">Due Date</label>
+                <p class="mt-1 block w-full px-3 py-2 shadow-sm text-xl"> 
+                    {{ formatDate(task.due_date) }} 
+                </p>
             </div>
 
             <div class="mb-4">
-                <label for="status" class="block text-sm font-medium text-gray-700">Status</label>
-                <select
-                    v-model="localTask.status"
-                    type="text" 
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                >
-                    <option value="pending"> Pending </option>
-                    <option value="progress"> Progress </option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700">Status</label>
+                <p class="mt-1 block w-full px-3 py-2 shadow-sm text-xl"> 
+                    {{ task.status }} 
+                </p>
             </div>
 
             <div class="mb-4">
-                <label for="priority" class="block text-sm font-medium text-gray-700">Priority</label>
-                <select
-                    v-model="localTask.priority"
-                    type="text" 
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"           
-                >
-                    <option value="high"> High</option>
-                    <option value="medium"> Medium </option>
-                    <option value="low"> Low </option>
-                </select>
+                <label class="block text-sm font-medium text-gray-700">Priority</label>
+                <p class="mt-1 block w-full px-3 py-2 shadow-sm text-xl"> 
+                    {{ task.priority }} 
+                </p>
             </div>
 
             <div class="mb-4">
-                <label  class="block text-sm font-medium text-gray-700">Due Date</label>
-                <input 
-                    v-model="localTask.due_date"
-                    type="date" 
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                />
+                <label class="block text-sm font-medium text-gray-700">Details</label>
+                <p class="mt-1 block w-full px-3 py-2 shadow-sm text-xl"> 
+                    {{ task.description }} 
+                </p>
             </div>
-
-            <div class="mb-4">
-                <label  class="block text-sm font-medium text-gray-700"> Description </label>
-                <textarea
-                    v-model="localTask.description"
-                    
-                    class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-                >
-                </textarea>
-            </div>
-
       </div>
     </div>
 </template>
   
 <script setup lang="ts">
-
 const props = defineProps({
-    task:Object,
-})
+    task: Object,
+});
+const emit = defineEmits(['close']);
+
+const closeModal = () => {
+    emit('close');
+};
+
+const formatDate = (date: string) => {
+    return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+};
 </script>
   
-  <style scoped>
-  .modal-overlay {
+<style scoped>
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -91,17 +77,17 @@ const props = defineProps({
     justify-content: center;
     align-items: center;
     z-index: 1000;
-  }
+}
   
-  .modal-content {
+.modal-content {
     background: white;
     padding: 20px;
     width: 400px;
     border-radius: 10px;
     position: relative;
-  }
+}
   
-  .close-button {
+.close-button {
     position: absolute;
     top: 10px;
     right: 10px;
@@ -109,22 +95,17 @@ const props = defineProps({
     background: none;
     font-size: 20px;
     cursor: pointer;
-  }
+}
   
-  .form-group {
-    margin-bottom: 15px;
-  }
-  
-  button {
+button {
     background-color: #007bff;
     color: white;
     padding: 10px 20px;
     border: none;
     cursor: pointer;
-  }
+}
   
-  button[type="submit"] {
+button[type="submit"] {
     width: 100%;
-  }
-  </style>
-  
+}
+</style>
