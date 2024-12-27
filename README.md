@@ -42,19 +42,14 @@ http://127.0.0.1:8000/api/login
 ```text 
 http://127.0.0.1:8000/:/api/tasks?params
 ```
-
-```json
-{
-    "title": "Task Title",
-    "description": "Et itaque voluptatem sunt quia ducimus. Asperiores alias labore inventore quibusdam tempora. Praesentium officiis maxime id accusantium cumque ut enim.",
-    "due_date": "2024-12-27",
-    "priority": "high",
-    "status": "pending",
-    "assigned_to":1,
-    "user_id": 1
-}
+---text 
+params key and value 
+due_date:2024-12-27
+status:completed
+priority:high
+search_query:task title,
+order_by:due_date-DESC,
 ```
-
 ### Show task 
 ```text 
 http://127.0.0.1:8000/api/tasks
