@@ -57,8 +57,10 @@ http://127.0.0.1:8000/api/login
 ```text 
 http://127.0.0.1:8000/:/api/tasks?params
 ```
----text 
+```text 
 params key and value 
+```
+```text
 due_date:2024-12-27
 status:completed
 priority:high
@@ -86,7 +88,6 @@ http://127.0.0.1:8000/api/tasks
 }
 ```
 ### Show task
-```
 ```text 
 http://127.0.0.1:8000/api/tasks/task-title
 ```
